@@ -18,7 +18,7 @@
 #include "unistd.h"
 
 char *get_next_line(int fd) {
-  t_list *store;
+  static t_list *store;
   char *line;
   int bytes_read;
 
@@ -27,9 +27,9 @@ char *get_next_line(int fd) {
   bytes_read = 1;
   line = NULL;
 
+  // 1. Read from fd until the buffer size and store.
   read_and_store(&store, &bytes_read);
 
-  // Read from fd and store
   return line;
 }
 
@@ -38,9 +38,41 @@ void read_and_store(t_list **store, int *p_read) {
   buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
   if (!buffer)
     return;
-  while ((*p_read = read(fd, buffer, BUFFER_SIZE - 1))) {
+  *p_read = read(fd, buffer, BUFFER_SIZE - 1);
+  while (*p_read > 0) {
     buffer[*p_read] = '\0';
   }
+  (*store)->content = buffer;
+}
+
+int found_newline(t_list *store) {
+  t_list *tmp;
+  int i;
+
+  i = 0;
+  store = tmp;
+  while (tmp) {
+    i = 0;
+    while (tmp->content[i]) {
+      if (tmp->content[i] == '\n') {
+        return (1);
+      }
+      i++;
+    }
+    tmp = tmp->next;
+  }
+  return (0);
+}
+
+t_list *add_to_store(char *content) {
+  t_list *lst;
+
+  lst = (t_list *)malloc(sizeof(t_list));
+  if (!lst)
+    return (NULL);
+  lst->content = content;
+  lst->next = NULL;
+  return lst;
 }
 
 int main(void) {

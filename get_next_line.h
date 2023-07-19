@@ -23,5 +23,6 @@ typedef struct s_list {
 } t_list;
 
 void read_and_store(t_list **store, int *p_read);
-
+char *get_next_line(int fd);
+t_list *ft_lst_last(t_list *lst);
 #endif
