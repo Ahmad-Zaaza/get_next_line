@@ -10,29 +10,52 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "get_next_line.h"
 #include "fcntl.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include "string.h"
 #include "unistd.h"
 
+char *get_next_line(int fd) {
+  t_list *store;
+  char *line;
+  int bytes_read;
 
-char *get_next_line(int fd) {}
+  if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, line, 0) < 0)
+    return (NULL);
+  bytes_read = 1;
+  line = NULL;
+
+  read_and_store(&store, &bytes_read);
+
+  // Read from fd and store
+  return line;
+}
+
+void read_and_store(t_list **store, int *p_read) {
+  char *buffer;
+  buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+  if (!buffer)
+    return;
+  while ((*p_read = read(fd, buffer, BUFFER_SIZE - 1))) {
+    buffer[*p_read] = '\0';
+  }
+}
 
 int main(void) {
 
-  char buffer[BUFFER_SIZE];
-  int bytes_read;
-  char *newline;
-  int fd = open("./test.txt", O_RDONLY);
+  int fd;
+  char *line;
+  fd = open("./test.txt", O_RDONLY);
 
-  while ((bytes_read = read(fd, buffer, BUFFER_SIZE))) {
-    buffer[bytes_read] = '\0';
-    newline = strchr(buffer, '\n');
-    if (newline) {
-      //   *newline = '\0';
+  while (1) {
+    line = get_next_line(fd);
+    if (!line) {
+      break;
     }
-    printf("%s\t", buffer);
+    printf("%s\n", line);
   }
-
+  free(line);
   return (0);
 }

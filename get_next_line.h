@@ -11,7 +11,17 @@
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
+#define GET_NEXT_LINE_H
 
+#ifndef BUFFER_SIZE
 #define BUFFER_SIZE 256
+#endif
+
+typedef struct s_list {
+  char *content;
+  s_list *next;
+} t_list;
+
+void read_and_store(t_list **store, int *p_read);
 
 #endif
