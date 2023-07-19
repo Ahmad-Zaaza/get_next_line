@@ -11,38 +11,38 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include "fcntl.h"
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include "unistd.h"
 
 char *get_next_line(int fd) {
   static t_list *store;
   char *line;
   int bytes_read;
 
+  // check if fd is negative, if BUFFER_SIZE is negative, or we don't have
+  // permissions to read the file
   if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, line, 0) < 0)
     return (NULL);
   bytes_read = 1;
   line = NULL;
 
   // 1. Read from fd until the buffer size and store.
-  read_and_store(&store, &bytes_read);
+  read_and_store(&store, &bytes_read, fd);
 
+  ft_print_lst(&store);
   return line;
 }
 
-void read_and_store(t_list **store, int *p_read) {
+void read_and_store(t_list **store, int *p_read, int fd) {
   char *buffer;
   buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
   if (!buffer)
     return;
-  *p_read = read(fd, buffer, BUFFER_SIZE - 1);
-  while (*p_read > 0) {
+
+  while ((*p_read = read(fd, buffer, BUFFER_SIZE - 1))) {
+    printf("read: %d\n", *p_read);
     buffer[*p_read] = '\0';
+    add_to_store(store, buffer);
   }
-  (*store)->content = buffer;
+  // add the buffer to the list
 }
 
 int found_newline(t_list *store) {
@@ -64,17 +64,6 @@ int found_newline(t_list *store) {
   return (0);
 }
 
-t_list *add_to_store(char *content) {
-  t_list *lst;
-
-  lst = (t_list *)malloc(sizeof(t_list));
-  if (!lst)
-    return (NULL);
-  lst->content = content;
-  lst->next = NULL;
-  return lst;
-}
-
 int main(void) {
 
   int fd;
@@ -86,7 +75,7 @@ int main(void) {
     if (!line) {
       break;
     }
-    printf("%s\n", line);
+    // printf("%s\n", line);
   }
   free(line);
   return (0);
