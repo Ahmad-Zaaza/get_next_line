@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char *get_next_line(int fd) {
   static t_list *store;
@@ -41,13 +41,13 @@ char *get_next_line(int fd) {
 // }
 // int main(void) {
 //   int fd;
-// //   char line[BUFFER_SIZE] = {0};
+//   char line[BUFFER_SIZE] = {0};
 //   fd = open("./test.txt", O_RDONLY);
 
 //   printf("%s", get_next_line(fd));
-// //   line[41] = 0;
-// //   read(fd, line, 42);
-// //   printf("%s", line);
+//   line[41] = 0;
+//   read(fd, line, 42);
+//   printf("%s", line);
 //   //   printf("%s", get_next_line(fd));
 //   //   free(line);
 //   return (0);
