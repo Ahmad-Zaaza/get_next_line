@@ -1,194 +1,139 @@
 #include "get_next_line.h"
+#include <strings.h>
 
-t_list	*ft_lstlast(t_list *lst)
-{
-	t_list	*current;
+t_list *ft_lstlast(t_list *lst) {
+  t_list *current;
 
-	if (!lst)
-		return (NULL);
-	current = lst;
-	while (current->next)
-	{
-		current = current->next;
-	}
-	return (current);
-}
-t_list	*ft_lstfirst(t_list *lst)
-{
-	t_list	*current;
-
-	if (!lst)
-		return (NULL);
-	current = lst;
-	while (current->prev)
-	{
-		current = current->prev;
-	}
-	return (current);
+  if (!lst)
+    return (NULL);
+  current = lst;
+  while (current->next) {
+    current = current->next;
+  }
+  return (current);
 }
 
-void	lstclear_prev(t_list *node)
-{
-	t_list	*current;
-	t_list	*tmp;
+t_list *ft_lstnew(char *content) {
+  t_list *lst;
 
-	current = node->prev;
-	while (current)
-	{
-		tmp = current->prev;
-		free(current->content);
-		free(current);
-		current = tmp;
-	}
+  lst = (t_list *)malloc(sizeof(t_list));
+  if (!lst)
+    return (NULL);
+  lst->content = content;
+  lst->next = NULL;
+  return (lst);
 }
 
-t_list	*ft_lstnew(char *content)
-{
-	t_list	*lst;
+void ft_lstadd_back(t_list **store, t_list *lst) {
+  t_list *last;
 
-	lst = (t_list *)malloc(sizeof(t_list));
-	if (!lst)
-		return (NULL);
-	lst->content = content;
-	lst->next = NULL;
-	lst->prev = NULL;
-	return (lst);
+  if (!*store) {
+    *store = lst;
+  } else {
+    last = ft_lstlast(*store);
+    last->next = lst;
+  }
 }
 
-void	ft_lstadd_back(t_list **store, t_list *lst)
-{
-	t_list	*last;
+char *get_line(t_list **store) {
+  t_list *current;
+  int count;
 
-	if (!*store)
-	{
-		*store = lst;
-	}
-	else
-	{
-		last = ft_lstlast(*store);
-		lst->prev = last;
-		last->next = lst;
-	}
+  current = *store;
+  count = 1;
+
+  while (current) {
+    if (current->content[0] == '\n' || !current->next) {
+      return fill_and_purge(store, count);
+    }
+    current = current->next;
+    count++;
+  }
+  return (NULL);
+}
+char *fill_and_purge(t_list **store, int node_index) {
+  t_list *tmp;
+  int i;
+  char *line;
+
+  line = (char *)malloc(sizeof(char) * node_index + 1);
+  if (!line)
+    return (NULL);
+  i = 0;
+  // line[node_index] = '\0';
+  bzero(line, node_index + 1);
+  while (*store) {
+    if ((*store)->content[0] == '\n') {
+      line[i] = '\n';
+      tmp = (*store)->next;
+      free((*store)->content);
+      free((*store));
+      *store = tmp;
+      break;
+    } else {
+      line[i] = (*store)->content[0];
+      tmp = (*store)->next;
+      free((*store)->content);
+      free((*store));
+      *store = tmp;
+      i++;
+    }
+  }
+  return (line);
+}
+void read_and_store(t_list **store, int fd) {
+  char *buffer;
+  int readed;
+  int i;
+
+  buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+  if (!buffer)
+    return;
+  while ((readed = read(fd, buffer, BUFFER_SIZE))) {
+    i = 0;
+    buffer[readed] = '\0';
+    while (buffer[i]) {
+      ft_lstadd_back(store, ft_lstnew(ft_strdup(&buffer[i])));
+      i++;
+    }
+  }
+  free(buffer);
 }
 
-void	add_to_store(t_list **store, char *content)
-{
-	int	i;
+void ft_print_lst(t_list **store) {
+  t_list *tmp;
 
-	// char	*str;
-	// str = ft_strdup(content);
-	// if (!str)
-	// 	return ;
-	i = 0;
-	while (content[i])
-	{
-		if (content[i] == '\n')
-		{
-      
-		}
-		ft_lstadd_back(store, ft_lstnew(&content[i]));
-		i++;
-	}
+  tmp = *store;
+  while (tmp) {
+    printf("%s\n", tmp->content);
+    tmp = tmp->next;
+  }
 }
 
-void	ft_print_lst(t_list **store)
-{
-	t_list	*tmp;
+char *ft_strdup(char *content) {
+  char *str;
+  int i;
+  int len;
 
-	tmp = *store;
-	while (tmp)
-	{
-		printf("%s\n", tmp->content);
-		tmp = tmp->next;
-	}
+  len = ft_strlen(content);
+  str = (char *)malloc(sizeof(char) * len + 1);
+  if (!str)
+    return (NULL);
+  i = 0;
+  while (content[i]) {
+    str[i] = content[i];
+    i++;
+  }
+  str[i] = '\0';
+  return (str);
 }
 
-char	*ft_strdup(char *content)
-{
-	char	*str;
-	int		i;
-	int		len;
+int ft_strlen(const char *str) {
+  int i;
 
-	len = ft_strlen(content);
-	str = (char *)malloc(sizeof(char) * len + 1);
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (content[i])
-	{
-		str[i] = content[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-int	ft_strlen(const char *str)
-{
-	int	i;
-
-	i = 0;
-	while (str[i])
-	{
-		i++;
-	}
-	return (i);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	int		s1_len;
-	int		s2_len;
-	char	*str;
-	int		i;
-	int		j;
-
-	if (!s1 || !s2)
-		return (NULL);
-	s1_len = ft_strlen(s1);
-	s2_len = ft_strlen(s2);
-	str = (char *)malloc(s1_len + s2_len + 1);
-	if (!str)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (s1[i])
-		str[j++] = s1[i++];
-	i = 0;
-	while (s2[i])
-		str[j++] = s2[i++];
-	str[j] = '\0';
-	return (str);
-}
-
-size_t	ft_strlcat(char *dest, char *src, size_t dest_size)
-{
-	size_t	i;
-	size_t	dest_len;
-
-	if (dest_size == 0)
-		return (ft_strlen(src));
-	dest_len = ft_strlen(dest);
-	if (dest_size <= dest_len)
-		return (ft_strlen(src) + dest_size);
-	i = 0;
-	while (src[i] && dest_len < (dest_size - 1))
-	{
-		dest[dest_len++] = src[i++];
-	}
-	dest[dest_len] = '\0';
-	return (dest_len + ft_strlen(&src[i]));
-}
-
-size_t	ft_strncat(char *dest, char *src, size_t n)
-{
-	size_t	i;
-	size_t	dest_len;
-
-	dest_len = ft_strlen(dest);
-	i = 0;
-	while (src[i] && i < n)
-		dest[dest_len++] = src[i++];
-	dest[dest_len] = '\0';
-	return (dest_len);
+  i = 0;
+  while (str[i]) {
+    i++;
+  }
+  return (i);
 }
