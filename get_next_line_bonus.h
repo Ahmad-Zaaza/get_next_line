@@ -6,7 +6,7 @@
 /*   By: azaaza <azaaza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/19 00:20:26 by ahmadzaaza        #+#    #+#             */
-/*   Updated: 2023/07/23 17:53:27 by azaaza           ###   ########.fr       */
+/*   Updated: 2023/07/23 18:17:56 by azaaza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ typedef struct s_queue
 
 typedef struct s_table_item
 {
-	t_queue			*queue;
-	int				key;
+	t_queue			queue;
+	int				init;
 }					t_table_item;
 
 char				*get_next_line(int fd);

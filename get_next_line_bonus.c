@@ -6,7 +6,7 @@
 /*   By: azaaza <azaaza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/18 23:46:35 by ahmadzaaza        #+#    #+#             */
-/*   Updated: 2023/07/23 17:55:29 by azaaza           ###   ########.fr       */
+/*   Updated: 2023/07/23 18:31:29 by azaaza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,27 @@
 
 char	*get_next_line(int fd)
 {
-	static t_table_item	table[MAX_FD];
+	static t_table_item	table[MAX_FD] = {0};
 	char				*buffer;
 	int					readed;
-	t_queue				queue;
+	t_table_item		*item;
 
-	buffer = NULL;
 	if (fd < 0 || fd > MAX_FD || BUFFER_SIZE <= 0 || read(fd, buffer, 0) < 0)
-	{
-		free(buffer);
 		return (NULL);
+	item = &table[fd];
+	if (item->init == 0)
+	{
+		init_queue(&item->queue);
+		item->init = 1;
 	}
-	if (has_newline(&queue))
-		return (get_line(&queue));
+	if (has_newline(&item->queue))
+		return (get_line(&item->queue));
 	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
 	if (!buffer)
 		return (NULL);
 	readed = read(fd, buffer, BUFFER_SIZE);
 	buffer[readed] = '\0';
-	return (handle_read(fd, readed, buffer, &queue));
+	return (handle_read(fd, readed, buffer, &item->queue));
 }
 
 char	*handle_read(int fd, int readed, char *buffer, t_queue *queue)
