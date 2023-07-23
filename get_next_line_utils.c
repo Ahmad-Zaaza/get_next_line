@@ -1,122 +1,121 @@
 #include "get_next_line.h"
+#include <stdlib.h>
 #include <strings.h>
 
-t_list *ft_lstlast(t_list *lst) {
-  t_list *current;
-
-  if (!lst)
-    return (NULL);
-  current = lst;
-  while (current->next) {
-    current = current->next;
-  }
-  return (current);
+void	init_queue(t_queue *queue)
+{
+	queue->first = NULL;
+	queue->last = NULL;
 }
 
-t_list *ft_lstnew(char *content) {
-  t_list *lst;
+int	has_newline(t_queue *queue)
+{
+	t_list	*tmp;
+	int		i;
 
-  lst = (t_list *)malloc(sizeof(t_list));
-  if (!lst)
-    return (NULL);
-  lst->content = content;
-  lst->next = NULL;
-  return (lst);
+	tmp = queue->first;
+	while (tmp)
+	{
+		i = 0;
+		if (tmp->content == '\n')
+			return (1);
+		i++;
+		tmp = tmp->next;
+	}
+	return (0);
 }
 
-void ft_lstadd_back(t_list **store, t_list *lst) {
-  t_list *last;
+char	*get_line(t_queue *queue)
+{
+	int		count;
+	char	*str;
+	t_list	*tmp;
 
-  if (!*store) {
-    *store = lst;
-  } else {
-    last = ft_lstlast(*store);
-    last->next = lst;
-  }
+	tmp = queue->first;
+	count = 0;
+	while (tmp && tmp->content != '\n')
+	{
+		count++;
+		tmp = tmp->next;
+	}
+	str = (char *)malloc(sizeof(char) * count + 2);
+	if (!str)
+		return (NULL);
+	count = 0;
+	while (queue->first && queue->first->content != '\n')
+		str[count++] = unshift_queue(queue);
+	str[count++] = unshift_queue(queue);
+	str[count] = '\0';
+	return (str);
 }
 
-char *get_line(t_list **store) {
-  t_list *current;
-  int count;
+char	*get_rest(t_queue *queue)
+{
+	t_list	*tmp;
+	char	*line;
+	int		count;
 
-  current = *store;
-  count = 1;
-
-  while (current) {
-    if (current->content[0] == '\n' || !current->next) {
-      return fill_and_purge(store, count);
-    }
-    current = current->next;
-    count++;
-  }
-  return (NULL);
+	tmp = queue->first;
+	count = 0;
+	while (tmp)
+	{
+		count++;
+		tmp = tmp->next;
+	}
+	line = (char *)malloc(count + 1);
+	count = 0;
+	while (queue->first)
+	{
+		line[count++] = unshift_queue(queue);
+	}
+	line[count] = '\0';
+	return (line);
 }
 
-char *fill_and_purge(t_list **store, int node_index) {
-  t_list *tmp;
-  int i;
-  char *line;
+char	unshift_queue(t_queue *queue)
+{
+	t_list	*tmp;
+	char	c;
 
-  line = (char *)malloc(sizeof(char) * node_index + 1);
-  if (!line)
-    return (NULL);
-  i = 0;
-  bzero(line, node_index + 1);
-  while (*store && i < node_index) {
-
-    line[i] = (*store)->content[0];
-    tmp = (*store)->next;
-    free((*store)->content);
-    free((*store));
-    *store = tmp;
-    i++;
-  }
-  return (line);
-}
-void read_and_store(t_list **store, int fd) {
-  char *buffer;
-  int readed;
-  int i;
-
-  buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
-  if (!buffer)
-    return;
-
-  while ((readed = read(fd, buffer, BUFFER_SIZE))) {
-    i = 0;
-    buffer[readed] = '\0';
-    while (buffer[i]) {
-      ft_lstadd_back(store, ft_lstnew(ft_strdup(&buffer[i])));
-      i++;
-    }
-  }
-  free(buffer);
+	c = queue->first->content;
+	tmp = queue->first;
+	queue->first = queue->first->next;
+	free(tmp);
+	return (c);
 }
 
-char *ft_strdup(char *content) {
-  char *str;
-  int i;
-  int len;
+void	push_queue(t_queue *queue, char content)
+{
+	t_list	*new;
 
-  len = ft_strlen(content);
-  str = (char *)malloc(sizeof(char) * len + 1);
-  if (!str)
-    return (NULL);
-  i = 0;
-  while (content[i]) {
-    str[i] = content[i];
-    i++;
-  }
-  str[i] = '\0';
-  return (str);
+	new = ft_lstnew(content);
+	if (!new)
+		return ;
+	if (!queue->first)
+	{
+		queue->first = new;
+		queue->last = new;
+	}
+	else
+	{
+		queue->last->next = new;
+		queue->last = new;
+	}
 }
 
-int ft_strlen(const char *str) {
-  int i;
+t_list	*ft_lstnew(char content)
+{
+	t_list	*lst;
 
-  i = 0;
-  while (str[i]) {
-    i++;
-  }
-  return (i);
+	lst = (t_list *)malloc(sizeof(t_list));
+	if (!lst)
+		return (NULL);
+	lst->content = content;
+	lst->next = NULL;
+	return (lst);
+}
+
+int	queue_empty(t_queue *queue)
+{
+	return (!queue->first);
 }

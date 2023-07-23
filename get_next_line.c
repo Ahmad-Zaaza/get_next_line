@@ -6,24 +6,63 @@
 /*   By: azaaza <azaaza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/18 23:46:35 by ahmadzaaza        #+#    #+#             */
-/*   Updated: 2023/07/21 19:38:30 by azaaza           ###   ########.fr       */
+/*   Updated: 2023/07/23 16:06:37 by azaaza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *get_next_line(int fd) {
-  static t_list *store;
-  char *line;
+char	*get_next_line(int fd)
+{
+	static t_queue	queue;
+	static int		is_init;
+	char			*buffer;
+	int				readed;
 
-  // check if fd is negative, if BUFFER_SIZE is negative, or we don't have
-  // permissions to read the file
-  line = NULL;
-  if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, line, 0) < 0)
-    return (NULL);
-  read_and_store(&store, fd);
-  line = get_line(&store);
-  return (line);
+	buffer = NULL;
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, buffer, 0) < 0)
+	{
+		free(buffer);
+		return (NULL);
+	}
+	if (!is_init)
+	{
+		init_queue(&queue);
+		is_init = 1;
+	}
+	if (has_newline(&queue))
+		return (get_line(&queue));
+	buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+	if (!buffer)
+		return (NULL);
+	readed = read(fd, buffer, BUFFER_SIZE);
+	buffer[readed] = '\0';
+	return (handle_read(fd, readed, buffer, &queue));
+}
+
+char	*handle_read(int fd, int readed, char *buffer, t_queue *queue)
+{
+	int	i;
+
+	if (readed > 0)
+	{
+		i = 0;
+		while (buffer[i])
+		{
+			push_queue(queue, buffer[i]);
+			i++;
+		}
+		free(buffer);
+		return (get_next_line(fd));
+	}
+	else
+	{
+		free(buffer);
+		if (queue_empty(queue))
+			return (NULL);
+		else
+			return (get_rest(queue));
+	}
 }
 
 // int main(void) {
@@ -39,16 +78,19 @@ char *get_next_line(int fd) {
 //   //   free(line);
 //   return (0);
 // }
-// int main(void) {
-//   int fd;
-// //   char line[BUFFER_SIZE] = {0};
-//   fd = open("./test.txt", O_RDONLY);
+// int	main(void)
+// {
+// 	int fd;
+// 	//   char line[BUFFER_SIZE] = {0};
+// 	fd = open("./test.txt", O_RDONLY);
 
-//   printf("%s", get_next_line(fd));
-// //   line[41] = 0;
-// //   read(fd, line, 42);
-// //   printf("%s", line);
-//   //   printf("%s", get_next_line(fd));
-//   //   free(line);
-//   return (0);
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	printf("%s", get_next_line(fd));
+// 	//   line[41] = 0;
+// 	//   read(fd, line, 42);
+// 	//   printf("%s", line);
+// 	//   printf("%s", get_next_line(fd));
+// 	//   free(line);
+// 	return (0);
 // }
