@@ -1,6 +1,4 @@
 #include "get_next_line.h"
-#include <stdlib.h>
-#include <strings.h>
 
 void	init_queue(t_queue *queue)
 {
