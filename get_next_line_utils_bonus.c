@@ -1,32 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: azaaza <azaaza@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/07/25 10:51:17 by azaaza            #+#    #+#             */
+/*   Updated: 2023/07/25 10:53:58 by azaaza           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line_bonus.h"
-
-void	init_queue(t_queue *queue)
-{
-	queue->first = NULL;
-	queue->last = NULL;
-}
-
-int	hash_code(int key)
-{
-	return (key % MAX_FD);
-}
-
-int	has_newline(t_queue *queue)
-{
-	t_list	*tmp;
-	int		i;
-
-	tmp = queue->first;
-	while (tmp)
-	{
-		i = 0;
-		if (tmp->content == '\n')
-			return (1);
-		i++;
-		tmp = tmp->next;
-	}
-	return (0);
-}
 
 char	*get_line(t_queue *queue)
 {
@@ -116,9 +100,4 @@ t_list	*ft_lstnew(char content)
 	lst->content = content;
 	lst->next = NULL;
 	return (lst);
-}
-
-int	queue_empty(t_queue *queue)
-{
-	return (!queue->first);
 }

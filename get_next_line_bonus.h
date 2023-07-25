@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_bonus.h                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ahmadzaaza <ahmadzaaza@student.42.fr>      +#+  +:+       +#+        */
+/*   By: azaaza <azaaza@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/19 00:20:26 by ahmadzaaza        #+#    #+#             */
-/*   Updated: 2023/07/23 22:10:32 by ahmadzaaza       ###   ########.fr       */
+/*   Updated: 2023/07/25 10:58:17 by azaaza           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,4 @@ char				*handle_read(int fd, int readed, char *buffer,
 int					queue_empty(t_queue *queue);
 char				*get_rest(t_queue *queue);
 t_list				*ft_lstnew(char content);
-
 #endif

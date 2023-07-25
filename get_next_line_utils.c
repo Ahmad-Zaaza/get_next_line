@@ -1,27 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: azaaza <azaaza@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/07/25 10:51:26 by azaaza            #+#    #+#             */
+/*   Updated: 2023/07/25 10:54:23 by azaaza           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
-
-void	init_queue(t_queue *queue)
-{
-	queue->first = NULL;
-	queue->last = NULL;
-}
-
-int	has_newline(t_queue *queue)
-{
-	t_list	*tmp;
-	int		i;
-
-	tmp = queue->first;
-	while (tmp)
-	{
-		i = 0;
-		if (tmp->content == '\n')
-			return (1);
-		i++;
-		tmp = tmp->next;
-	}
-	return (0);
-}
 
 char	*get_line(t_queue *queue)
 {
@@ -111,9 +100,4 @@ t_list	*ft_lstnew(char content)
 	lst->content = content;
 	lst->next = NULL;
 	return (lst);
-}
-
-int	queue_empty(t_queue *queue)
-{
-	return (!queue->first);
 }
